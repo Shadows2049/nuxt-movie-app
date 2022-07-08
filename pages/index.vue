@@ -9,10 +9,12 @@
         placeholder="Keywords"
         v-model.lazy="searchInput"
       />
-      <button v-show="searchInput !== ''" class="button">Clear Search</button>
+      <button @click="clearSearch" v-show="searchInput !== ''" class="button">
+        Clear Search
+      </button>
     </div>
-
-    <div class="container movies">
+    <Loading v-if="$fetchState.pending" />
+    <div v-else class="container movies">
       <div v-if="searchInput !== ''" id="movie-grid" class="movies-grid">
         <div
           class="movie"
@@ -85,6 +87,7 @@
 
 <script>
 import axios from 'axios'
+import Loading from '../components/Loading.vue'
 export default {
   name: 'home',
   data() {
@@ -103,9 +106,7 @@ export default {
       return
     }
   },
-  mounted() {
-    if (!this.loaded) this.$fetch()
-  },
+  fetchOnServer: false,
 
   methods: {
     async getMovies() {
@@ -113,7 +114,6 @@ export default {
         `https://api.themoviedb.org/3/movie/now_playing?api_key=460781cf13d89c9998933001675ff5d0`
       )
       const result = await data
-
       result.data.results.forEach((movie) => {
         this.movies.push(movie)
       })
@@ -129,7 +129,12 @@ export default {
       })
       console.log(this.searchedMovies)
     },
+    clearSearch() {
+      this.searchInput = ''
+      this.searchedMovies = []
+    },
   },
+  components: { Loading },
 }
 </script>
 
