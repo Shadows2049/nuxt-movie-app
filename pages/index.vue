@@ -144,6 +144,7 @@ export default {
         `https://api.themoviedb.org/3/search/movie?api_key=460781cf13d89c9998933001675ff5d0&language=en-US&page=1&query=${this.searchInput}`
       )
       const result = await data
+      this.searchedMovies = []
       result.data.results.forEach((movie) => {
         this.searchedMovies.push(movie)
       })
