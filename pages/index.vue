@@ -90,6 +90,23 @@ import axios from 'axios'
 import Loading from '../components/Loading.vue'
 export default {
   name: 'home',
+  head() {
+    return {
+      title: 'Latest Streaming Movies',
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: 'Get all the latest streaming movies',
+        },
+        {
+          hid: 'keywords',
+          name: 'keywords',
+          content: 'latest, streaming, movies',
+        },
+      ],
+    }
+  },
   data() {
     return {
       movies: [],
