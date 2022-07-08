@@ -107,6 +107,7 @@ export default {
     }
   },
   fetchOnServer: false,
+  fetchDelay: 1000,
 
   methods: {
     async getMovies() {
