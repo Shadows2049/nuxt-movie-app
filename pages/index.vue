@@ -115,6 +115,8 @@ export default {
         `https://api.themoviedb.org/3/movie/now_playing?api_key=460781cf13d89c9998933001675ff5d0`
       )
       const result = await data
+      this.movies = []
+
       result.data.results.forEach((movie) => {
         this.movies.push(movie)
       })
