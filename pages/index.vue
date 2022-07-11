@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Hero />
+    <Hero ref="mychild" />
 
     <div class="container search">
       <input
@@ -9,9 +9,27 @@
         placeholder="Keywords"
         v-model.lazy="searchInput"
       />
-      <button @click="clearSearch" v-show="searchInput !== ''" class="button">
+      <button
+        @click="clearSearch(), changeF('Now Streaming'), $fetch()"
+        v-show="searchInput !== ''"
+        class="button"
+      >
         Clear Search
       </button>
+      <div class="nav">
+        <button
+          @click="changeT('What\'s Popular'), clearSearch(), $fetch()"
+          class="button popular"
+        >
+          Popular
+        </button>
+        <button
+          @click="changeF('Now Streaming'), clearSearch(), $fetch()"
+          class="button"
+        >
+          Streaming
+        </button>
+      </div>
     </div>
     <Loading v-if="$fetchState.pending" />
     <div v-else class="container movies">
@@ -50,8 +68,47 @@
           </div>
         </div>
       </div>
-      <div v-else id="movie-grid" class="movies-grid">
+      <div
+        v-if="searchInput === '' && flag === ''"
+        id="movie-grid"
+        class="movies-grid"
+      >
         <div class="movie" v-for="(movie, index) in movies" :key="index">
+          <div class="movie-img">
+            <img
+              :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`"
+            />
+            <p class="review">{{ movie.vote_average }}</p>
+            <p class="overview">{{ movie.overview }}</p>
+          </div>
+          <div class="info">
+            <p class="title">
+              {{ movie.title }}
+            </p>
+            <p class="release">
+              Released:
+              {{
+                new Date(movie.release_date).toLocaleString('en-us', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              }}
+            </p>
+            <NuxtLink
+              class="button button-light"
+              :to="{ name: 'movies-movieid', params: { movieid: movie.id } }"
+              >Get More Info</NuxtLink
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        v-if="searchInput === '' && flag === true"
+        id="movie-grid"
+        class="movies-grid"
+      >
+        <div class="movie" v-for="(movie, index) in popMovies" :key="index">
           <div class="movie-img">
             <img
               :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`"
@@ -87,6 +144,7 @@
 
 <script>
 import axios from 'axios'
+import Hero from '../components/Hero.vue'
 import Loading from '../components/Loading.vue'
 export default {
   name: 'home',
@@ -111,14 +169,22 @@ export default {
     return {
       movies: [],
       searchedMovies: [],
+      popMovies: [],
       searchInput: '',
+      flag: '',
     }
   },
   async fetch() {
-    if (this.searchInput === '') {
+    console.log(this.flag)
+    if (this.searchInput === '' && this.flag === '') {
       await this.getMovies()
       return
+    }
+    if (this.searchInput === '' && this.flag === true) {
+      await this.popularMovies()
+      return
     } else {
+      this.changeF(this.searchInput)
       await this.searchMovies()
       return
     }
@@ -128,8 +194,9 @@ export default {
 
   methods: {
     async getMovies() {
+      this.flag = ''
       const data = axios.get(
-        `https://api.themoviedb.org/3/movie/now_playing?api_key=460781cf13d89c9998933001675ff5d0`
+        `https://api.themoviedb.org/3/movie/now_playing?api_key=460781cf13d89c9998933001675ff5d0&page=1`
       )
       const result = await data
       this.movies = []
@@ -139,7 +206,20 @@ export default {
       })
       console.log(this.movies)
     },
+    async popularMovies() {
+      const data = axios.get(
+        `https://api.themoviedb.org/3/movie/popular?api_key=460781cf13d89c9998933001675ff5d0&page=1`
+      )
+      const result = await data
+      this.popMovies = []
+
+      result.data.results.forEach((movie) => {
+        this.popMovies.push(movie)
+      })
+      console.log(this.popMovies)
+    },
     async searchMovies() {
+      this.flag = ''
       const data = axios.get(
         `https://api.themoviedb.org/3/search/movie?api_key=460781cf13d89c9998933001675ff5d0&language=en-US&page=1&query=${this.searchInput}`
       )
@@ -154,8 +234,16 @@ export default {
       this.searchInput = ''
       this.searchedMovies = []
     },
+    changeT(title) {
+      this.flag = true
+      this.$refs.mychild.changeTitle(title)
+    },
+    changeF(title) {
+      this.flag = ''
+      this.$refs.mychild.changeTitle(title)
+    },
   },
-  components: { Loading },
+  components: { Loading, Hero },
 }
 </script>
 
@@ -185,6 +273,10 @@ export default {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
     }
+  }
+  .nav {
+    display: flex;
+    margin-left: auto;
   }
 
   .movies {

@@ -3,8 +3,10 @@
     <img src="../assets/imgs/movieHero.jpg" />
     <div class="text-container">
       <div class="text">
-        <span class="mini-heading">Now Streaming</span>
-        <h1><span>Now</span> Streaming</h1>
+        <span class="mini-heading">{{ title }}</span>
+        <h1>
+          <span>{{ title }}</span>
+        </h1>
         <a href="#movie-grid" class="button">View Movies</a>
       </div>
     </div>
@@ -13,6 +15,16 @@
 <script>
 export default {
   name: 'Hero',
+  data() {
+    return {
+      title: 'Now Streaming',
+    }
+  },
+  methods: {
+    changeTitle(tt) {
+      this.title = tt
+    },
+  },
 }
 </script>
 
