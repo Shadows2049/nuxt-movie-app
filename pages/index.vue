@@ -18,10 +18,10 @@
       </button>
       <div class="nav">
         <button
-          @click="changeU('UpComing Movies'), clearSearch(), $fetch()"
+          @click="changeU('Trending Past Week'), clearSearch(), $fetch()"
           class="button"
         >
-          Upcoming
+          Trending
         </button>
         <button
           @click="changeT('What\'s Popular'), clearSearch(), $fetch()"
