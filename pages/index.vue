@@ -18,8 +18,14 @@
       </button>
       <div class="nav">
         <button
+          @click="changeU('UpComing Movies'), clearSearch(), $fetch()"
+          class="button"
+        >
+          Upcoming
+        </button>
+        <button
           @click="changeT('What\'s Popular'), clearSearch(), $fetch()"
-          class="button popular"
+          class="button"
         >
           Popular
         </button>
@@ -104,11 +110,46 @@
         </div>
       </div>
       <div
-        v-if="searchInput === '' && flag === true"
+        v-if="searchInput === '' && flag === '1'"
         id="movie-grid"
         class="movies-grid"
       >
         <div class="movie" v-for="(movie, index) in popMovies" :key="index">
+          <div class="movie-img">
+            <img
+              :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`"
+            />
+            <p class="review">{{ movie.vote_average }}</p>
+            <p class="overview">{{ movie.overview }}</p>
+          </div>
+          <div class="info">
+            <p class="title">
+              {{ movie.title }}
+            </p>
+            <p class="release">
+              Released:
+              {{
+                new Date(movie.release_date).toLocaleString('en-us', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              }}
+            </p>
+            <NuxtLink
+              class="button button-light"
+              :to="{ name: 'movies-movieid', params: { movieid: movie.id } }"
+              >Get More Info</NuxtLink
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        v-if="searchInput === '' && flag === '2'"
+        id="movie-grid"
+        class="movies-grid"
+      >
+        <div class="movie" v-for="(movie, index) in upComing" :key="index">
           <div class="movie-img">
             <img
               :src="`https://image.tmdb.org/t/p/w500/${movie.poster_path}`"
@@ -170,6 +211,7 @@ export default {
       movies: [],
       searchedMovies: [],
       popMovies: [],
+      upComing: [],
       searchInput: '',
       flag: '',
     }
@@ -180,8 +222,12 @@ export default {
       await this.getMovies()
       return
     }
-    if (this.searchInput === '' && this.flag === true) {
+    if (this.searchInput === '' && this.flag === '1') {
       await this.popularMovies()
+      return
+    }
+    if (this.searchInput === '' && this.flag === '2') {
+      await this.upMovies()
       return
     } else {
       this.changeF(this.searchInput)
@@ -218,6 +264,18 @@ export default {
       })
       console.log(this.popMovies)
     },
+    async upMovies() {
+      const data = axios.get(
+        `https://api.themoviedb.org/3/trending/all/week?api_key=460781cf13d89c9998933001675ff5d0&page=1`
+      )
+      const result = await data
+      this.upComing = []
+
+      result.data.results.forEach((movie) => {
+        this.upComing.push(movie)
+      })
+      console.log(this.upComing)
+    },
     async searchMovies() {
       this.flag = ''
       const data = axios.get(
@@ -235,11 +293,15 @@ export default {
       this.searchedMovies = []
     },
     changeT(title) {
-      this.flag = true
+      this.flag = '1'
       this.$refs.mychild.changeTitle(title)
     },
     changeF(title) {
       this.flag = ''
+      this.$refs.mychild.changeTitle(title)
+    },
+    changeU(title) {
+      this.flag = '2'
       this.$refs.mychild.changeTitle(title)
     },
   },
