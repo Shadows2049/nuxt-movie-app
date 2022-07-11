@@ -191,7 +191,7 @@ export default {
   name: 'home',
   head() {
     return {
-      title: 'Latest Streaming Movies',
+      title: this.appTitle,
       meta: [
         {
           hid: 'description',
@@ -214,6 +214,7 @@ export default {
       upComing: [],
       searchInput: '',
       flag: '',
+      appTitle: '',
     }
   },
   async fetch() {
@@ -240,6 +241,7 @@ export default {
 
   methods: {
     async getMovies() {
+      this.appTitle = 'Latest Streaming Movies'
       this.flag = ''
       const data = axios.get(
         `https://api.themoviedb.org/3/movie/now_playing?api_key=460781cf13d89c9998933001675ff5d0&page=1`
@@ -253,6 +255,7 @@ export default {
       console.log(this.movies)
     },
     async popularMovies() {
+      this.appTitle = 'Popular Movies'
       const data = axios.get(
         `https://api.themoviedb.org/3/movie/popular?api_key=460781cf13d89c9998933001675ff5d0&page=1`
       )
@@ -265,6 +268,7 @@ export default {
       console.log(this.popMovies)
     },
     async upMovies() {
+      this.appTitle = 'Weekly Trending Movies'
       const data = axios.get(
         `https://api.themoviedb.org/3/trending/all/week?api_key=460781cf13d89c9998933001675ff5d0&page=1`
       )
@@ -277,6 +281,7 @@ export default {
       console.log(this.upComing)
     },
     async searchMovies() {
+      this.appTitle = 'Gallery'
       this.flag = ''
       const data = axios.get(
         `https://api.themoviedb.org/3/search/movie?api_key=460781cf13d89c9998933001675ff5d0&language=en-US&page=1&query=${this.searchInput}`
