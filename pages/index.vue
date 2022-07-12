@@ -189,6 +189,7 @@ import Hero from '../components/Hero.vue'
 import Loading from '../components/Loading.vue'
 export default {
   name: 'home',
+  ssr: false,
   head() {
     return {
       title: this.appTitle,
